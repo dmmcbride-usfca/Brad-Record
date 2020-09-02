@@ -1,1 +1,167 @@
+import java.util.Scanner;
 
+public class sudoku
+{
+	//sets the test Sudoko puzzle
+	public static int[][] test= 
+	{
+	  {5, 3, 0, 0, 7, 0, 0, 0, 0},
+	  {6, 0, 0, 1, 9, 5, 0, 0, 0},
+	  {0, 9, 8, 0, 0, 0, 0, 6, 0},
+	  {8, 0, 0, 0, 6, 0, 0, 0, 3},
+	  {4, 0, 0, 8, 0, 3, 0, 0, 1},
+	  {7, 0, 0, 0, 2, 0, 0, 0, 6},
+	  {0, 6, 0, 0, 0, 0, 2, 8, 0},
+	  {0, 0, 0, 4, 1, 9, 0, 0, 5},
+	  {0, 0, 0, 0, 8, 0, 0, 7, 9} 
+	};
+	
+	private int[][] board;
+
+	public static final int EMPTY = 0; //initializes empty cell
+
+	public static final int SIZE = 9; //initializes size of the Sudoku grid
+	
+	//sets the initial board
+	public sudoku(int[][] board)
+	{
+		this.board = new int[SIZE][SIZE];
+		
+		for (int r = 0; r < SIZE; r++)
+		{
+			for (int c = 0; c < SIZE; c++)
+			{
+				this.board[r][c] = board[r][c];
+			}
+		}
+	}
+	
+	//check if number is already in a row
+	private boolean in_row(int row, int num)
+	{
+		for (int r = 0; r < SIZE; r++)
+		{
+			if (board[row][r] == num)
+			{
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	//check if number is already in a column
+	private boolean in_col(int col, int num)
+	{
+		for (int c = 0; c < SIZE; c++)
+		{
+			if (board[c][col] == num)
+			{
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	// we check if a possible number is in its 3x3 box
+	private boolean in_box(int row, int col, int num)
+	{
+		int r = row - row % 3;
+		int c = col - col % 3;
+		
+		for (int i = r; i < r + 3; i++)
+		{
+			for (int j = c; j < c + 3; j++)
+			{
+				if (board[i][j] == num)
+				{
+					return true;
+				}
+			}
+		}
+		
+		return false;
+	}
+	
+	//check to see if a number matches any others in any of the other row or column
+	private boolean check(int row, int col, int num)
+	{
+		return !in_row(row, num)  &&  !in_col(col, num)  &&  !in_box(row, col, num);
+	}
+	
+	//recursive solve method that seaches for empty cells and tests until it finds the correct one
+    public boolean solve()
+    {
+       	for (int row = 0; row < SIZE; row++)
+       	{
+       		for (int col = 0; col < SIZE; col++)
+        	{
+        		// we search an empty cell
+        		if (board[row][col] == EMPTY)
+          		{
+            	// we try possible numbers
+            	for (int num = 1; num <= SIZE; num++)
+            	{
+            		if (check(row, col, num))
+            		{
+               			//the number ok. it respects sudoku constraints
+               			board[row][col] = num;
+
+           				if (solve())
+               			{ 
+               				//then we start by backtracking recursively
+               				return true;
+               			}
+               			else
+               			{ 
+              				//if it is not a solution, then we empty the cell and continue
+               				board[row][col] = EMPTY;
+               			}
+           			}
+           		}
+
+           		return false; //could not solve
+           	}
+        }
+    }
+
+    return true; //puzzle is solved
+	}
+	
+	public void display()
+	{
+		for (int r = 0; r < SIZE; r++)
+		{
+			for (int c = 0; c < SIZE; c++)
+			{
+				System.out.print(" " + board[r][c]);
+			}
+		
+			System.out.println();
+		}
+
+		System.out.println();
+	}
+	
+	public static void main(String[] args)
+	{
+		sudoku sudoku = new sudoku(test);
+
+		System.out.println("\nHere is the Sudoku puzzle to solve\n");
+
+		sudoku.display();
+		
+		if (sudoku.solve())
+		{
+			System.out.println("Sudoku puzzle has been solved\n");
+
+			sudoku.display();
+
+		}
+		else
+		{
+			System.out.println("The Sudoku puzzle is unsolvable");
+		}
+	}
+}
